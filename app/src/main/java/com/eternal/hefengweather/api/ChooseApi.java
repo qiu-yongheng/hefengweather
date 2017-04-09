@@ -1,7 +1,7 @@
 package com.eternal.hefengweather.api;
 
-import com.eternal.hefengweather.bean.CountyBean;
-import com.eternal.hefengweather.bean.ProvinceBean;
+import com.eternal.hefengweather.bean.area.CountyBean;
+import com.eternal.hefengweather.bean.area.ProvinceBean;
 
 import java.util.ArrayList;
 

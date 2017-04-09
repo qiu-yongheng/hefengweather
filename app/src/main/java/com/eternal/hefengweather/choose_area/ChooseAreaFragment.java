@@ -1,6 +1,7 @@
 package com.eternal.hefengweather.choose_area;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -16,6 +17,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.eternal.hefengweather.R;
+import com.eternal.hefengweather.weater_show.WeatherActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,7 @@ public class ChooseAreaFragment extends Fragment implements ChooseAreaContract.V
     private static final int LEVEL_PROVINCE = 1;
     private static final int LEVEL_CITY = 2;
     private static final int LEVEL_COUNTY = 3;
+    private static final int LEVEL_START = 4;
     public int position;
 
     public ChooseAreaFragment() {
@@ -136,10 +139,10 @@ public class ChooseAreaFragment extends Fragment implements ChooseAreaContract.V
      * 返回数据
      *
      * @param dataList
-     * @param provinceName
+     * @param data
      */
     @Override
-    public void showResults(List<String> dataList, String provinceName) {
+    public void showResults(List<String> dataList, String data) {
         switch (presenter.currentLevel()) {
             case LEVEL_PROVINCE:
                 mBackButton.setVisibility(View.GONE);
@@ -147,7 +150,17 @@ public class ChooseAreaFragment extends Fragment implements ChooseAreaContract.V
                 break;
             case LEVEL_CITY:
                 mBackButton.setVisibility(View.VISIBLE);
-                mTitleText.setText(provinceName);
+                mTitleText.setText(data);
+                break;
+            case LEVEL_COUNTY:
+                mBackButton.setVisibility(View.VISIBLE);
+                mTitleText.setText(data);
+                break;
+            case LEVEL_START:
+                Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                intent.putExtra("weather_id", data);
+                startActivity(intent);
+                getActivity().finish();
                 break;
         }
         mLvChoose.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList));

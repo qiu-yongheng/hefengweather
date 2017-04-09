@@ -4,8 +4,8 @@ import android.content.Context;
 import android.util.Log;
 
 import com.eternal.hefengweather.api.ChooseApi;
-import com.eternal.hefengweather.bean.CountyBean;
-import com.eternal.hefengweather.bean.ProvinceBean;
+import com.eternal.hefengweather.bean.area.CountyBean;
+import com.eternal.hefengweather.bean.area.ProvinceBean;
 import com.eternal.hefengweather.db.City;
 import com.eternal.hefengweather.db.County;
 import com.eternal.hefengweather.db.Province;
@@ -36,6 +36,8 @@ public class ChooseAreaPresenter implements ChooseAreaContract.Presenter {
     private static final int LEVEL_PROVINCE = 1;
     private static final int LEVEL_CITY = 2;
     private static final int LEVEL_COUNTY = 3;
+    private static final int LEVEL_START = 4;
+
     private List<String> dataList = new ArrayList<>();
     /**
      * 当前选中的级别
@@ -45,6 +47,7 @@ public class ChooseAreaPresenter implements ChooseAreaContract.Presenter {
     private List<City> mCities;
     private int mProvinceCode;
     private int mCityId;
+    private List<County> mCounties;
 
 
     public ChooseAreaPresenter(Context context, ChooseAreaContract.View view) {
@@ -221,10 +224,10 @@ public class ChooseAreaPresenter implements ChooseAreaContract.Presenter {
             case LEVEL_CITY:
                 City city1 = mCities.get(position);
                 mCityId = city1.getCityId();
-                List<County> counties = DataSupport.where("cityid = ?", String.valueOf(city1.getCityId())).find(County.class);
-                if (!counties.isEmpty()) {
+                mCounties = DataSupport.where("cityid = ?", String.valueOf(city1.getCityId())).find(County.class);
+                if (!mCounties.isEmpty()) {
                     dataList.clear();
-                    for (County county : counties) {
+                    for (County county : mCounties) {
                         dataList.add(county.getCountyName());
                     }
                     currentLevel = LEVEL_COUNTY;
@@ -233,6 +236,13 @@ public class ChooseAreaPresenter implements ChooseAreaContract.Presenter {
                 } else {
                     queryFromServer(position, currentL);
                 }
+                break;
+            case LEVEL_COUNTY:
+                County county = mCounties.get(position);
+                String weatherId = county.getWeatherId();
+                currentLevel = LEVEL_START;
+                view.showResults(dataList, weatherId);
+                view.stopLoading();
                 break;
         }
     }
