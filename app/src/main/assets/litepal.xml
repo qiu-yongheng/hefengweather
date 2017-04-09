@@ -1,0 +1,9 @@
+<litepal>
+    <dbname value="hefeng_weather" />
+    <version value="1"/>
+    <list>
+        <mapping class="com.eternal.hefengweather.db.City"/>
+        <mapping class="com.eternal.hefengweather.db.County"/>
+        <mapping class="com.eternal.hefengweather.db.Province"/>
+    </list>
+</litepal>
