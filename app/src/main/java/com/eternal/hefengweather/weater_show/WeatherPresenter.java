@@ -5,11 +5,15 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import com.eternal.hefengweather.api.BingPicApi;
 import com.eternal.hefengweather.api.WeatherApi;
 import com.eternal.hefengweather.bean.weather.HeWeather5;
 import com.eternal.hefengweather.bean.weather.Weather;
 import com.google.gson.Gson;
 
+import java.io.IOException;
+
+import okhttp3.ResponseBody;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -23,7 +27,7 @@ import rx.schedulers.Schedulers;
  * @desc ${TODO}
  */
 
-public class WeatherPresenter implements WeatherContract.Presenter{
+public class WeatherPresenter implements WeatherContract.Presenter {
 
     private final Context context;
     private final WeatherContract.View view;
@@ -44,6 +48,7 @@ public class WeatherPresenter implements WeatherContract.Presenter{
     @Override
     public void loadDatas() {
         view.showLoading();
+        // 获取天气数据的缓存
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String weatherString = prefs.getString("weather", null);
         if (weatherString != null) {
@@ -58,10 +63,56 @@ public class WeatherPresenter implements WeatherContract.Presenter{
             view.hideWeatherLayout();
             requestWeather(weatherId);
         }
+
+        // 获取背景图的缓存
+        String bingPic = prefs.getString("bing_pic", null);
+        if (bingPic != null) {
+            view.showBackground(bingPic);
+        } else {
+            loadBingPic();
+        }
+    }
+
+    /**
+     * 获取背景图
+     */
+    private void loadBingPic() {
+        new Retrofit.Builder()
+                .baseUrl("http://guolin.tech/api/bing_pic/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
+                .build()
+                .create(BingPicApi.class)
+                .getBingPic("http://guolin.tech/api/bing_pic")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<ResponseBody>() {
+                    @Override
+                    public void onCompleted() {
+                        loadDatas();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(ResponseBody responseBody) {
+                        try {
+                            SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(context).edit();
+                            editor.putString("bing_pic", responseBody.string());
+                            editor.apply();
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                });
     }
 
     /**
      * 网络请求
+     *
      * @param weatherId
      */
     private void requestWeather(final String weatherId) {
@@ -96,6 +147,7 @@ public class WeatherPresenter implements WeatherContract.Presenter{
                         }
                     }
                 });
+        loadBingPic();
     }
 
     @Override

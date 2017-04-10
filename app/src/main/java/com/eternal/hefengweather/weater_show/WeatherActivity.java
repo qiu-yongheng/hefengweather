@@ -1,5 +1,7 @@
 package com.eternal.hefengweather.weater_show;
 
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
@@ -7,10 +9,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.eternal.hefengweather.R;
 import com.eternal.hefengweather.bean.weather.Forecast;
 import com.eternal.hefengweather.bean.weather.Weather;
@@ -24,7 +28,7 @@ import butterknife.ButterKnife;
  * @desc ${TODO}
  */
 
-public class WeatherActivity extends AppCompatActivity implements WeatherContract.View{
+public class WeatherActivity extends AppCompatActivity implements WeatherContract.View {
     @BindView(R.id.nav_button)
     Button mNavButton;
     @BindView(R.id.title_city)
@@ -49,11 +53,19 @@ public class WeatherActivity extends AppCompatActivity implements WeatherContrac
     TextView mSportText;
     @BindView(R.id.weather_layout)
     ScrollView mWeatherLayout;
+    @BindView(R.id.bing_pic_img)
+    ImageView mBingPicImg;
     private WeatherContract.Presenter presenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // 实现背景图与状态栏融合
+        if (Build.VERSION.SDK_INT >= 21) {
+            View decorView = getWindow().getDecorView();
+            decorView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+            getWindow().setStatusBarColor(Color.TRANSPARENT);
+        }
         setContentView(R.layout.activity_weather);
         ButterKnife.bind(this);
         new WeatherPresenter(this, this);
@@ -100,6 +112,13 @@ public class WeatherActivity extends AppCompatActivity implements WeatherContrac
     @Override
     public void showResults(Weather weather) {
         showWeatherInfo(weather);
+    }
+
+    @Override
+    public void showBackground(String picUrl) {
+        Glide.with(this)
+                .load(picUrl)
+                .into(mBingPicImg);
     }
 
     /**

@@ -2,7 +2,6 @@ package com.eternal.hefengweather.weater_show;
 
 import com.eternal.hefengweather.BasePresenter;
 import com.eternal.hefengweather.BaseView;
-import com.eternal.hefengweather.bean.weather.HeWeather5;
 import com.eternal.hefengweather.bean.weather.Weather;
 
 /**
@@ -22,6 +21,8 @@ public interface WeatherContract {
         void hideWeatherLayout();
         //成功获取到数据后, 在界面中显示
         void showResults(Weather weather);
+        //设置背景图
+        void showBackground(String picUrl);
     }
 
     interface Presenter extends BasePresenter {

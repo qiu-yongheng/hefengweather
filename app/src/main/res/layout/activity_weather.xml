@@ -3,6 +3,11 @@
              android:background="@color/colorPrimary"
               android:layout_width="match_parent"
               android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/bing_pic_img"
+        android:scaleType="centerCrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
     <ScrollView
         android:scrollbars="none"
         android:overScrollMode="never"
@@ -10,6 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
         <LinearLayout
+            android:fitsSystemWindows="true"
             android:orientation="vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
