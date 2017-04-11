@@ -5,10 +5,14 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
@@ -18,6 +22,8 @@ import com.bumptech.glide.Glide;
 import com.eternal.hefengweather.R;
 import com.eternal.hefengweather.bean.weather.Forecast;
 import com.eternal.hefengweather.bean.weather.Weather;
+import com.eternal.hefengweather.choose_area.ChooseAreaFragment;
+import com.eternal.hefengweather.choose_area.ChooseAreaPresenter;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -55,7 +61,14 @@ public class WeatherActivity extends AppCompatActivity implements WeatherContrac
     ScrollView mWeatherLayout;
     @BindView(R.id.bing_pic_img)
     ImageView mBingPicImg;
-    private WeatherContract.Presenter presenter;
+    @BindView(R.id.swipe_refresh)
+    SwipeRefreshLayout mSwipeRefresh;
+    @BindView(R.id.drawer_layout)
+    public DrawerLayout mDrawerLayout;
+    @BindView(R.id.choose_area_fragment)
+    FrameLayout mChooseAreaFragment;
+    public WeatherContract.Presenter presenter;
+    private ChooseAreaFragment chooseFragment;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,9 +81,20 @@ public class WeatherActivity extends AppCompatActivity implements WeatherContrac
         }
         setContentView(R.layout.activity_weather);
         ButterKnife.bind(this);
+        initViews(mSwipeRefresh);
+        initListener();
         new WeatherPresenter(this, this);
         // 加载数据
         presenter.start();
+    }
+
+    private void initListener() {
+        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                presenter.refresh();
+            }
+        });
     }
 
     @Override
@@ -80,7 +104,20 @@ public class WeatherActivity extends AppCompatActivity implements WeatherContrac
 
     @Override
     public void initViews(View view) {
-
+        mSwipeRefresh.setColorSchemeResources(R.color.colorPrimary);
+        chooseFragment = ChooseAreaFragment.getInstance();
+        if (!chooseFragment.isAdded()) {
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.choose_area_fragment, chooseFragment, "ChooseFragment")
+                    .commit();
+        }
+        new ChooseAreaPresenter(this, chooseFragment);
+        mNavButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mDrawerLayout.openDrawer(GravityCompat.START);
+            }
+        });
     }
 
     @Override
@@ -96,12 +133,22 @@ public class WeatherActivity extends AppCompatActivity implements WeatherContrac
 
     @Override
     public void showLoading() {
-
+        mSwipeRefresh.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefresh.setRefreshing(true);
+            }
+        });
     }
 
     @Override
     public void stopLoading() {
-
+        mSwipeRefresh.post(new Runnable() {
+            @Override
+            public void run() {
+                mSwipeRefresh.setRefreshing(false);
+            }
+        });
     }
 
     @Override

@@ -29,5 +29,6 @@ public interface WeatherContract {
         //请求数据
         void loadDatas();
         void refresh();
+        void refresh(String weatherId );
     }
 }

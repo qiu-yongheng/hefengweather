@@ -16,10 +16,10 @@ import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.eternal.hefengweather.MainActivity;
 import com.eternal.hefengweather.R;
 import com.eternal.hefengweather.weater_show.WeatherActivity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -39,7 +39,6 @@ public class ChooseAreaFragment extends Fragment implements ChooseAreaContract.V
     @BindView(R.id.lv_choose)
     ListView mLvChoose;
     private ChooseAreaContract.Presenter presenter;
-    private List<String> dataList = new ArrayList<>();
     private ProgressDialog progressDialog;
     private static final int LEVEL_PROVINCE = 1;
     private static final int LEVEL_CITY = 2;
@@ -157,10 +156,16 @@ public class ChooseAreaFragment extends Fragment implements ChooseAreaContract.V
                 mTitleText.setText(data);
                 break;
             case LEVEL_START:
-                Intent intent = new Intent(getActivity(), WeatherActivity.class);
-                intent.putExtra("weather_id", data);
-                startActivity(intent);
-                getActivity().finish();
+                if (getActivity() instanceof MainActivity) {
+                    Intent intent = new Intent(getActivity(), WeatherActivity.class);
+                    intent.putExtra("weather_id", data);
+                    startActivity(intent);
+                    getActivity().finish();
+                } else if (getActivity() instanceof WeatherActivity) {
+                    WeatherActivity activity = (WeatherActivity) getActivity();
+                    activity.mDrawerLayout.closeDrawers();
+                    activity.presenter.refresh(data);
+                }
                 break;
         }
         mLvChoose.setAdapter(new ArrayAdapter<>(getContext(), android.R.layout.simple_list_item_1, dataList));

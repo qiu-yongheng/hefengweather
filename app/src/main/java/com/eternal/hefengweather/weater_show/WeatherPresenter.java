@@ -152,6 +152,13 @@ public class WeatherPresenter implements WeatherContract.Presenter {
 
     @Override
     public void refresh() {
+        Activity activity = (Activity) context;
+        String weatherId = activity.getIntent().getStringExtra("weather_id");
+        requestWeather(weatherId);
+    }
 
+    @Override
+    public void refresh(String weatherId) {
+        requestWeather(weatherId);
     }
 }
