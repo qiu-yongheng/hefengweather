@@ -2,6 +2,7 @@ package com.eternal.hefengweather.weater_show;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
@@ -9,6 +10,7 @@ import com.eternal.hefengweather.api.BingPicApi;
 import com.eternal.hefengweather.api.WeatherApi;
 import com.eternal.hefengweather.bean.weather.HeWeather5;
 import com.eternal.hefengweather.bean.weather.Weather;
+import com.eternal.hefengweather.service.AutoUpdateService;
 import com.google.gson.Gson;
 
 import java.io.IOException;
@@ -56,6 +58,10 @@ public class WeatherPresenter implements WeatherContract.Presenter {
             Weather weather = gson.fromJson(weatherString, Weather.class);
             view.showResults(weather);
             view.stopLoading();
+
+            // 启动定时更新服务
+            Intent intent = new Intent(context, AutoUpdateService.class);
+            context.startService(intent);
         } else {
             // 无缓存时去服务器查询天气, 返回解析后的数据
             Activity activity = (Activity) context;

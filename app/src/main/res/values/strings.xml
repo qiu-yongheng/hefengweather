@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HeFengWeather</string>
+    <string name="app_name">和风天气</string>
     <string name="error">加载失败</string>
     <string name="retry">重试</string>
 </resources>
